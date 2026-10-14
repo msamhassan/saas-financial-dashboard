@@ -1,0 +1,87 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Sales Performance</title>
+<style>/*__CSS__*/
+.g3{display:grid;grid-template-columns:1.55fr 1fr 1fr;grid-template-rows:auto minmax(0,1fr);gap:12px;flex:1;min-height:0}
+.g3 .card{overflow:hidden}
+#lb td{padding:3px 4px;font-size:11px;white-space:nowrap}#lb th{padding:3px 4px}
+td .ab{display:inline-block;height:9px;border-radius:2px;vertical-align:middle;margin-right:5px}
+td.c,th.c{text-align:center}
+.rk{display:inline-block;width:18px;height:18px;border-radius:50%;background:#edebe9;text-align:center;line-height:18px;font-size:10px;font-weight:600}
+.rk.t{background:#f2c811;color:#252423}
+</style></head><body>
+<div class="frame">
+ __NAV__
+ <div class="main">
+  <div class="top">
+   <div class="title"><h1>Sales Team Performance</h1><p>FY2026 · New-logo bookings from CRM closed-won deals · Quota = annual new-ARR target</p></div>
+   <div class="slicers">
+    <div class="sl"><small>Fiscal Year</small><b>FY2026</b></div>
+    <div class="sl"><small>Team</small><b>All</b></div>
+    <div class="sl"><small>Manager</small><b>All</b></div>
+    <div class="sl"><small>Segment</small><b>All</b></div>
+   </div>
+  </div>
+  <div class="kpis" id="kpis"></div>
+  <div class="g3">
+   <div class="card" style="grid-column:1/3"><h3>Rep Leaderboard</h3><div class="sub">Ranked by new ARR booked · Book NRR = 12-month net revenue retention of accounts each rep owns</div><table id="lb"></table></div>
+   <div class="card"><h3>Quota Attainment by Rep</h3><div class="sub">New ARR booked ÷ annual quota</div><svg id="att" width="100%" height="290"></svg></div>
+   <div class="card"><h3>New ARR Booked by Month &amp; Team</h3><div class="sub">Closed-won ARR, $K</div>
+    <div class="legend" id="lg"></div><svg id="bm" width="100%" height="190"></svg></div>
+   <div class="card"><h3>Why Deals Were Lost</h3><div class="sub">Closed-lost opportunities by loss reason</div><svg id="loss" width="100%" height="215"></svg></div>
+   <div class="card"><h3>Win Rate vs. Sales Cycle</h3><div class="sub">One bubble per rep · size = deals won · colour = team</div><svg id="sc" width="100%" height="215"></svg></div>
+  </div>
+  <div class="foot"><span>Sources: crm_customers.xlsx (Opportunities, Sales_Reps), billing_subscription_export.xlsx · Measures: [New ARR Booked], [Quota Attainment %], [Win Rate %], [Book NRR % (12m)]</span><span>Bookings reconciled to billing ✓</span></div>
+ </div>
+</div>
+<script>
+const D=/*__DATA__*/;
+/*__HELPERS__*/
+const S=D.sales,R=S.reps,TEAMS=["North America","EMEA","APAC","LATAM"],TC={"North America":css("--b"),"EMEA":css("--a"),"APAC":css("--c"),"LATAM":css("--d")};
+const att=S.new_arr/S.quota;
+const k=[["New ARR Booked",money(S.new_arr),`${S.deals_won} deals won`,"up"],
+ ["Quota Attainment",pct(att),`of ${money(S.quota)} team quota`,att>=1?"up":"dn"],
+ ["Reps at Quota",`${S.reps_at_quota} / ${R.length}`,`${pct(S.reps_at_quota/R.length,0)} of the team`,"up"],
+ ["Win Rate",pct(S.win_rate),`${num(S.deals_won)} won · ${num(S.deals_lost)} lost`,""],
+ ["Avg Deal Size",money(S.avg_deal),"ARR per closed-won deal",""],
+ ["Avg Sales Cycle",S.cycle.toFixed(0)+" days","created → closed-won",""]];
+document.getElementById("kpis").innerHTML=k.map(([a,b,c,d])=>`<div class="card kpi"><small>${a}</small><div class="v">${b}</div><div class="d ${d}" style="${d?'':'color:#605e5c'}">${c}</div></div>`).join("");
+// leaderboard
+document.getElementById("lb").innerHTML=`<tr><th class="c">#</th><th>Sales rep</th><th>Team</th><th>Coverage</th><th class="n">New ARR</th><th class="n">Quota</th><th>Attainment</th><th class="n">Won</th><th class="n">Win %</th><th class="n">Cycle</th><th class="n">Book NRR</th></tr>`+
+ R.map((r,i)=>{const a=r.attain,c=a>=1?css("--good"):css("--c");
+  return `<tr><td class="c"><span class="rk ${i<3?'t':''}">${i+1}</span></td><td><b style="font-weight:600">${r.name}</b></td><td>${r.team}</td><td style="color:#605e5c">${r.segs}</td>
+  <td class="n">${money(r.new_arr)}</td><td class="n" style="color:#605e5c">${money(r.quota)}</td>
+  <td><span class="ab" style="width:${Math.min(a,1.3)/1.3*70}px;background:${c}"></span>${pct(a,0)}</td>
+  <td class="n">${r.won}</td><td class="n">${pct(r.win_rate,0)}</td><td class="n">${r.cycle.toFixed(0)}d</td>
+  <td class="n ${r.book_nrr>=1?'up':'dn'}">${pct(r.book_nrr,0)}</td></tr>`}).join("");
+// attainment bars
+(function(){const s=document.getElementById("att"),W=s.clientWidth,L=96,top=4,bh=16,g=6,mx=1.3,sc=v=>L+(W-L-40)*Math.min(v,mx)/mx;
+ const rs=[...R].sort((a,b)=>b.attain-a.attain);
+ rs.forEach((r,i)=>{const y=top+i*(bh+g);txt(s,L-6,y+12,r.name,{"text-anchor":"end",fill:"#252423","font-size":10.5});
+  el("rect",{x:L,y,width:sc(r.attain)-L,height:bh,rx:2,fill:r.attain>=1?css("--a"):"#9ec9f5"},s);
+  txt(s,sc(r.attain)+4,y+12,pct(r.attain,0),{"font-size":10.5,fill:"#252423","font-weight":600})});
+ const x=sc(1);el("line",{x1:x,x2:x,y1:0,y2:top+R.length*(bh+g),stroke:css("--c"),"stroke-dasharray":"4 3","stroke-width":1.5},s);
+ txt(s,x+3,top+R.length*(bh+g)+8,"100% quota",{fill:css("--c")})})();
+// bookings stacked by team
+document.getElementById("lg").innerHTML=TEAMS.map(t=>`<span><i style="background:${TC[t]}"></i>${t}</span>`).join("");
+(function(){const s=document.getElementById("bm"),W=s.clientWidth,H=190,L=40,T=8,B=20,h=H-T-B,w=W-L-6,bw=w/12;
+ const tot=[...Array(12).keys()].map(i=>TEAMS.reduce((a,t)=>a+S.team_month[t][i],0)),mx=Math.ceil(Math.max(...tot)/400)*400,y=v=>T+h*(1-v/mx);
+ for(let v=0;v<=mx;v+=mx/4){el("line",{x1:L,x2:W-6,y1:y(v),y2:y(v),stroke:"#f0efee"},s);txt(s,L-4,y(v)+3,v+"K",{"text-anchor":"end"})}
+ for(let i=0;i<12;i++){let acc=0;TEAMS.forEach(t=>{const v=S.team_month[t][i];el("rect",{x:L+bw*i+bw*.18,y:y(acc+v),width:bw*.64,height:y(acc)-y(acc+v),fill:TC[t]},s);acc+=v});
+  txt(s,L+bw*i+bw/2,H-6,D.months[i][0],{"text-anchor":"middle"})}})();
+// loss reasons
+(function(){const s=document.getElementById("loss"),W=s.clientWidth,L=112,bh=22,g=10,mx=Math.max(...S.loss.map(x=>x.n)),tot=S.loss.reduce((a,x)=>a+x.n,0);
+ S.loss.forEach((x,i)=>{const y=8+i*(bh+g),bw=(W-L-100)*x.n/mx;txt(s,L-6,y+15,x.LossReason,{"text-anchor":"end",fill:"#252423","font-size":11});
+  el("rect",{x:L,y,width:bw,height:bh,rx:2,fill:i<2?css("--c"):"#f2a77f"},s);
+  txt(s,L+bw+5,y+11,`${x.n} deals`,{"font-size":10.5,fill:"#252423","font-weight":600});txt(s,L+bw+5,y+22,pct(x.n/tot,0)+" · "+money(x.arr),{"font-size":9.5})});
+ const sw=S.seg_win;txt(s,0,8+5*(bh+g)+6,`Win rate by segment:  SMB ${pct(sw.SMB,0)}  ·  Mid-Market ${pct(sw["Mid-Market"],0)}  ·  Enterprise ${pct(sw.Enterprise,0)}`,{"font-size":10.5,fill:"#252423"})})();
+// scatter
+(function(){const s=document.getElementById("sc"),W=s.clientWidth,H=215,L=38,T=10,B=26,h=H-T-B,w=W-L-10;
+ const x=v=>L+w*(v/140),y=v=>T+h*(1-(v-.15)/(.40-.15));
+ [0,35,70,105,140].forEach(v=>{el("line",{x1:x(v),x2:x(v),y1:T,y2:T+h,stroke:"#f0efee"},s);txt(s,x(v),H-12,v+"d",{"text-anchor":"middle"})});
+ [.15,.20,.25,.30,.35,.40].forEach(v=>{el("line",{x1:L,x2:W-10,y1:y(v),y2:y(v),stroke:"#f0efee"},s);txt(s,L-4,y(v)+3,pct(v,0),{"text-anchor":"end"})});
+ txt(s,L+w/2,H-1,"Avg sales cycle (days)",{"text-anchor":"middle","font-size":9.5});
+ const mxw=Math.max(...R.map(r=>r.won));
+ [...R].sort((a,b)=>b.won-a.won).forEach(r=>{const cx=x(r.cycle),cy=y(r.win_rate),rad=4+10*Math.sqrt(r.won/mxw);
+  el("circle",{cx,cy,r:rad,fill:TC[r.team],"fill-opacity":.75,stroke:"#fff"},s);
+  txt(s,cx+rad+2,cy+3,r.name.split(" ")[0],{"font-size":9,fill:"#252423"})})})();
+</script></body></html>

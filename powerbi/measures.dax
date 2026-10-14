@@ -1,0 +1,349 @@
+// =====================================================================
+// Northwind Cloud – SaaS Financial Dashboard – DAX measures
+// Home table: _Measures (empty table used as a measure folder)
+//
+// Relationships (all single-direction, many-to-one):
+//   fact_MRR[CustomerID]            -> dim_Customer[CustomerID]
+//   fact_MRR[ProductCode]           -> dim_Product[ProductCode]
+//   fact_MRR[MonthStart]            -> dim_Date[Date]
+//   fact_MRR_Movements[CustomerID]  -> dim_Customer[CustomerID]
+//   fact_MRR_Movements[MonthStart]  -> dim_Date[Date]
+//   fact_GL[PostingMonth]           -> dim_Date[Date]
+//   fact_Budget[Month]              -> dim_Date[Date]
+//   fact_Cash[Month]                -> dim_Date[Date]
+//   dim_Customer[AccountOwnerID]    -> dim_SalesRep[SalesRepID]   (account owner = rep's book)
+//   fact_Opportunities[AccountOwnerID] -> dim_SalesRep[SalesRepID]
+//   fact_Opportunities[CloseDate]   -> dim_Date[Date]
+// fact_GL[Segment] and fact_Budget[Region] are joined virtually with TREATAS
+// so that the customer slicers (Segment, Region) also filter GL and budget.
+// =====================================================================
+
+
+// ---------- 1. Revenue & MRR ----------
+
+MRR Amount =
+SUM ( fact_MRR[MRR_USD] )
+// Additive across months = recognised subscription revenue for the period
+
+Subscription Revenue =
+[MRR Amount]
+
+Closing MRR =
+// MRR is a balance (semi-additive): take the last month that has data in the current filter
+CALCULATE ( [MRR Amount], LASTNONBLANK ( dim_Date[Date], [MRR Amount] ) )
+
+ARR =
+[Closing MRR] * 12
+
+MRR MoM Change =
+VAR LastMonth = MAX ( fact_MRR[MonthStart] )
+RETURN
+    [Closing MRR]
+        - CALCULATE ( [MRR Amount], REMOVEFILTERS ( dim_Date ), fact_MRR[MonthStart] = EDATE ( LastMonth, -1 ) )
+
+ARR YoY % =
+VAR PriorARR = CALCULATE ( [ARR], DATEADD ( dim_Date[Date], -12, MONTH ) )
+RETURN
+    DIVIDE ( [ARR] - PriorARR, PriorARR )
+
+Revenue Share of Total % =
+DIVIDE ( [ARR], CALCULATE ( [ARR], REMOVEFILTERS ( dim_Product ) ) )
+
+
+// ---------- 2. MRR movements (waterfall / roll-forward) ----------
+
+Opening MRR =
+CALCULATE (
+    SUM ( fact_MRR_Movements[OpeningMRR] ),
+    FIRSTNONBLANK ( dim_Date[Date], CALCULATE ( SUM ( fact_MRR_Movements[OpeningMRR] ) ) )
+)
+
+New MRR =
+SUM ( fact_MRR_Movements[NewMRR] )
+
+Expansion MRR =
+SUM ( fact_MRR_Movements[ExpansionMRR] )
+
+Contraction MRR =
+SUM ( fact_MRR_Movements[ContractionMRR] )
+
+Churned MRR =
+SUM ( fact_MRR_Movements[ChurnMRR] )
+
+FX Impact MRR =
+// change in USD MRR caused only by exchange rates (movements are classified in constant currency)
+SUM ( fact_MRR_Movements[FXImpactMRR] )
+
+Net New MRR =
+// operational growth, excludes FX
+[New MRR] + [Expansion MRR] - [Contraction MRR] - [Churned MRR]
+
+Churn + Contraction MRR (neg) =
+- ( [Churned MRR] + [Contraction MRR] )
+
+MRR Roll-forward Check =
+// Must be 0 for every month: Opening + movements + FX - Closing
+ROUND ( [Opening MRR] + [Net New MRR] + [FX Impact MRR] - [Closing MRR], 2 )
+
+
+// ---------- 3. Retention ----------
+
+NRR % (12m) =
+// Revenue today from the customers who were paying 12 months ago / their revenue 12 months ago
+VAR EndMonth   = MAX ( fact_MRR[MonthStart] )
+VAR StartMonth = EDATE ( EndMonth, -12 )
+VAR Cohort =
+    CALCULATETABLE ( VALUES ( fact_MRR[CustomerID] ), REMOVEFILTERS ( dim_Date ), fact_MRR[MonthStart] = StartMonth )
+VAR StartMRR =
+    CALCULATE ( [MRR Amount], REMOVEFILTERS ( dim_Date ), fact_MRR[MonthStart] = StartMonth )
+VAR EndMRR =
+    CALCULATE ( [MRR Amount], REMOVEFILTERS ( dim_Date ), fact_MRR[MonthStart] = EndMonth, Cohort )
+RETURN
+    DIVIDE ( EndMRR, StartMRR )
+
+GRR % (12m) =
+// Same cohort, but each customer is capped at its starting MRR (expansion excluded)
+VAR EndMonth   = MAX ( fact_MRR[MonthStart] )
+VAR StartMonth = EDATE ( EndMonth, -12 )
+VAR Cohort =
+    CALCULATETABLE ( VALUES ( fact_MRR[CustomerID] ), REMOVEFILTERS ( dim_Date ), fact_MRR[MonthStart] = StartMonth )
+VAR StartMRR =
+    CALCULATE ( [MRR Amount], REMOVEFILTERS ( dim_Date ), fact_MRR[MonthStart] = StartMonth )
+VAR Retained =
+    SUMX (
+        Cohort,
+        VAR s = CALCULATE ( [MRR Amount], REMOVEFILTERS ( dim_Date ), fact_MRR[MonthStart] = StartMonth )
+        VAR e = COALESCE ( CALCULATE ( [MRR Amount], REMOVEFILTERS ( dim_Date ), fact_MRR[MonthStart] = EndMonth ), 0 )
+        RETURN MIN ( s, e )
+    )
+RETURN
+    DIVIDE ( Retained, StartMRR )
+
+New Logos =
+SUM ( fact_MRR_Movements[IsNewLogo] )
+
+Churned Logos =
+SUM ( fact_MRR_Movements[IsChurnLogo] )
+
+Logo Churn % (avg monthly) =
+// average of each month's churned / opening customers – the KPI card
+AVERAGEX (
+    VALUES ( dim_Date[MonthStart] ),
+    DIVIDE (
+        CALCULATE ( SUM ( fact_MRR_Movements[IsChurnLogo] ) ),
+        CALCULATE ( SUM ( fact_MRR_Movements[IsOpeningLogo] ) )
+    )
+)
+
+Logo Churn % (pooled) =
+// total churned / total opening customer-months – used for LTV
+DIVIDE ( SUM ( fact_MRR_Movements[IsChurnLogo] ), SUM ( fact_MRR_Movements[IsOpeningLogo] ) )
+
+Active Customers =
+CALCULATE (
+    DISTINCTCOUNT ( fact_MRR[CustomerID] ),
+    LASTNONBLANK ( dim_Date[Date], [MRR Amount] )
+)
+
+
+// ---------- 4. P&L, margin, burn, runway (from GL) ----------
+
+GL Revenue =
+CALCULATE ( SUM ( fact_GL[Amount_USD] ), fact_GL[PnLGroup] = "Revenue" )
+
+COGS =
+CALCULATE ( SUM ( fact_GL[Amount_USD] ), fact_GL[PnLGroup] = "COGS" )
+
+Operating Expenses =
+CALCULATE ( SUM ( fact_GL[Amount_USD] ), fact_GL[PnLGroup] = "OpEx" )
+
+Gross Profit =
+[GL Revenue] - [COGS]
+
+Gross Margin % =
+DIVIDE ( [Gross Profit], [GL Revenue] )
+
+Net Burn =
+[COGS] + [Operating Expenses] - [GL Revenue]
+
+Closing Cash =
+CALCULATE ( SUM ( fact_Cash[ClosingCash_USD] ), LASTNONBLANK ( dim_Date[Date], CALCULATE ( SUM ( fact_Cash[ClosingCash_USD] ) ) ) )
+
+Cash Runway (months) =
+// closing cash / average net burn of the last 3 months
+VAR LastMonth = CALCULATE ( MAX ( fact_GL[PostingMonth] ) )
+VAR Cash =
+    CALCULATE ( SUM ( fact_Cash[ClosingCash_USD] ), REMOVEFILTERS ( dim_Date ), fact_Cash[Month] = LastMonth )
+VAR AvgBurn3M =
+    CALCULATE ( [Net Burn], DATESINPERIOD ( dim_Date[Date], EOMONTH ( LastMonth, 0 ), -3, MONTH ) ) / 3
+RETURN
+    DIVIDE ( Cash, AvgBurn3M )
+
+
+// ---------- 5. Unit economics ----------
+
+S&M Spend =
+// GL S&M is booked by segment; TREATAS lets the customer Segment slicer filter it
+CALCULATE (
+    SUM ( fact_GL[Amount_USD] ),
+    fact_GL[Category] = "OpEx - S&M",
+    TREATAS ( VALUES ( dim_Customer[Segment] ), fact_GL[Segment] )
+)
+
+CAC =
+DIVIDE ( [S&M Spend], [New Logos] )
+
+New Customer ARPA =
+DIVIDE ( [New MRR], [New Logos] )
+
+Gross Margin % (all segments) =
+// GM is a company-level figure – ignore customer filters
+CALCULATE ( [Gross Margin %], REMOVEFILTERS ( dim_Customer ) )
+
+CAC Payback (months) =
+DIVIDE ( [CAC], [New Customer ARPA] * [Gross Margin % (all segments)] )
+
+Customer Lifetime (months) =
+// 1 / churn, capped at 60 months so low-churn Enterprise doesn't produce an infinite LTV
+MIN ( DIVIDE ( 1, [Logo Churn % (pooled)] ), 60 )
+
+LTV =
+[New Customer ARPA] * [Gross Margin % (all segments)] * [Customer Lifetime (months)]
+
+LTV to CAC =
+DIVIDE ( [LTV], [CAC] )
+
+
+// ---------- 6. Budget vs actual ----------
+
+Budget Revenue =
+CALCULATE (
+    SUM ( fact_Budget[BudgetRevenue_USD] ),
+    TREATAS ( VALUES ( dim_Customer[Region] ), fact_Budget[Region] )
+)
+
+Revenue Variance =
+[Subscription Revenue] - [Budget Revenue]
+
+Revenue Variance % =
+DIVIDE ( [Revenue Variance], [Budget Revenue] )
+
+Variance Colour =
+// used in conditional formatting of the variance labels
+IF ( [Revenue Variance] >= 0, "#1A7F37", "#C4314B" )
+
+
+// ---------- 7. Sales rep performance (page 3) ----------
+
+Deals Won =
+CALCULATE ( COUNTROWS ( fact_Opportunities ), fact_Opportunities[Stage] = "Closed Won" )
+
+Deals Lost =
+CALCULATE ( COUNTROWS ( fact_Opportunities ), fact_Opportunities[Stage] = "Closed Lost" )
+
+Win Rate % =
+DIVIDE ( [Deals Won], [Deals Won] + [Deals Lost] )
+
+New ARR Booked =
+CALCULATE ( SUM ( fact_Opportunities[ARR_USD] ), fact_Opportunities[Stage] = "Closed Won" )
+
+Avg Deal Size (ARR) =
+DIVIDE ( [New ARR Booked], [Deals Won] )
+
+Avg Sales Cycle (days) =
+CALCULATE ( AVERAGE ( fact_Opportunities[SalesCycleDays] ), fact_Opportunities[Stage] = "Closed Won" )
+
+Quota (New ARR) =
+// annual quota, pro-rated to the months selected so a quarter shows a quarter of quota
+VAR MonthsSelected = DISTINCTCOUNT ( dim_Date[MonthStart] )
+VAR MonthsInYear   = CALCULATE ( DISTINCTCOUNT ( dim_Date[MonthStart] ), ALL ( dim_Date ), dim_Date[Year] = 2026 )
+RETURN
+    SUM ( dim_SalesRep[AnnualQuota_NewARR_USD] ) * DIVIDE ( MIN ( MonthsSelected, MonthsInYear ), 12 )
+
+Quota Attainment % =
+DIVIDE ( [New ARR Booked], [Quota (New ARR)] )
+
+Reps at Quota =
+COUNTROWS ( FILTER ( VALUES ( dim_SalesRep[SalesRepID] ), [Quota Attainment %] >= 1 ) )
+
+Rep Rank (New ARR) =
+RANKX ( ALL ( dim_SalesRep[SalesRepName] ), [New ARR Booked], , DESC, DENSE )
+
+Lost ARR =
+CALCULATE ( SUM ( fact_Opportunities[ARR_USD] ), fact_Opportunities[Stage] = "Closed Lost" )
+
+Book NRR % (12m) =
+// NRR of the accounts each rep owns – works because dim_Customer is filtered by dim_SalesRep
+[NRR % (12m)]
+
+Booked vs Billed New ARR (check) =
+// CRM closed-won ARR must equal new-logo MRR in billing x 12
+ROUND ( [New ARR Booked] - [New MRR] * 12, 0 )
+
+
+// ---------- 8. Customer insights (page 4) ----------
+
+ARPA (monthly) =
+DIVIDE ( [Closing MRR], [Active Customers] )
+
+Customer ARR Rank =
+IF (
+    ISINSCOPE ( dim_Customer[CustomerName] ),
+    RANKX ( ALLSELECTED ( dim_Customer[CustomerName] ), [ARR], , DESC, DENSE )
+)
+
+Top 10 Customers ARR =
+CALCULATE (
+    [ARR],
+    TOPN ( 10, ALLSELECTED ( dim_Customer[CustomerName] ), [ARR], DESC )
+)
+
+Top 10 Concentration % =
+DIVIDE ( [Top 10 Customers ARR], CALCULATE ( [ARR], ALLSELECTED ( dim_Customer ) ) )
+
+Customer Tenure (months) =
+DATEDIFF ( MIN ( dim_Customer[SignupDate] ), MAX ( dim_Date[Date] ), MONTH )
+
+Products Owned =
+CALCULATE ( DISTINCTCOUNT ( fact_MRR[ProductCode] ), LASTNONBLANK ( dim_Date[Date], [MRR Amount] ) )
+
+MRR Local 3 Months Ago =
+VAR LastMonth = MAX ( fact_MRR[MonthStart] )
+RETURN CALCULATE ( SUM ( fact_MRR[MRR_Local] ), REMOVEFILTERS ( dim_Date ), fact_MRR[MonthStart] = EDATE ( LastMonth, -3 ) )
+
+MRR Local Latest =
+VAR LastMonth = MAX ( fact_MRR[MonthStart] )
+RETURN CALCULATE ( SUM ( fact_MRR[MRR_Local] ), REMOVEFILTERS ( dim_Date ), fact_MRR[MonthStart] = LastMonth )
+
+Is At Risk =
+// still paying, but MRR down vs 3 months ago in constant currency
+VAR Now_  = [MRR Local Latest]
+VAR Then_ = [MRR Local 3 Months Ago]
+RETURN IF ( Now_ > 0 && Now_ < Then_ - 0.005, 1, 0 )
+
+At-Risk Customers =
+SUMX ( VALUES ( dim_Customer[CustomerID] ), [Is At Risk] )
+
+At-Risk ARR =
+SUMX ( FILTER ( VALUES ( dim_Customer[CustomerID] ), [Is At Risk] = 1 ), [ARR] )
+
+MRR Change vs 3M (constant ccy) % =
+DIVIDE ( [MRR Local Latest] - [MRR Local 3 Months Ago], [MRR Local 3 Months Ago] )
+
+Cohort Revenue Retention % =
+// matrix: rows = dim_Customer[SignupCohort], columns = dim_Date[MonthStart]
+VAR CohortStart = MIN ( dim_Customer[SignupCohort] )
+VAR CohortMRR   = CALCULATE ( [MRR Amount], REMOVEFILTERS ( dim_Date ), fact_MRR[MonthStart] = CohortStart )
+VAR ThisMonth   = MAX ( dim_Date[MonthStart] )
+RETURN
+    IF ( ThisMonth >= CohortStart,
+         DIVIDE ( CALCULATE ( [MRR Amount], REMOVEFILTERS ( dim_Date ), fact_MRR[MonthStart] = ThisMonth ), CohortMRR ) )
+
+
+// ---------- 9. Reconciliation measures (Recon page) ----------
+
+Recon | Model vs GL Revenue =
+ROUND ( [Subscription Revenue] - [GL Revenue], 2 )
+
+Recon | Status =
+IF ( ABS ( [Recon | Model vs GL Revenue] ) <= 1 && [MRR Roll-forward Check] = 0, "PASS", "CHECK" )

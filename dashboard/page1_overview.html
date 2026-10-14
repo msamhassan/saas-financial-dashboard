@@ -1,0 +1,97 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>SaaS Financial Dashboard</title>
+<style>/*__CSS__*/</style></head><body>
+<div class="frame">
+ __NAV__
+ <div class="main">
+  <div class="top">
+   <div class="title"><h1>Northwind Cloud — SaaS Financial Overview</h1><p>FY2026 · Monthly subscription performance · Amounts in USD</p></div>
+   <div class="slicers">
+    <div class="sl"><small>Fiscal Year</small><b>FY2026</b></div>
+    <div class="sl"><small>Region</small><b>All</b></div>
+    <div class="sl"><small>Plan Tier</small><b>All</b></div>
+    <div class="sl"><small>Segment</small><b>SMB, Mid-Market, Ent.</b></div>
+   </div>
+  </div>
+  <div class="kpis" id="kpis"></div>
+  <div class="grid">
+   <div class="card" style="grid-row:1"><h3>MRR Trend & Net New MRR</h3><div class="sub">Ending MRR (line) vs. Net New MRR components (bars), constant currency (FX impact +$9.7K in reconciliation sheet 3)</div>
+    <div class="legend"><span><i style="background:var(--b)"></i>Ending MRR</span><span><i style="background:var(--a)"></i>New</span><span><i style="background:#7fc4ff"></i>Expansion</span><span><i style="background:var(--c)"></i>Churn + Contraction</span></div>
+    <svg id="mrr" width="100%" height="240"></svg></div>
+   <div class="card"><h3>Revenue by Plan Tier</h3><div class="sub">Share of Dec-2026 ARR</div><svg id="donut" width="100%" height="250"></svg></div>
+   <div class="card"><h3>Unit Economics</h3><div class="sub">FY2026 CAC payback & LTV:CAC by segment</div><svg id="unit" width="100%" height="250"></svg></div>
+   <div class="card"><h3>Budget vs. Actual — Revenue</h3><div class="sub">Quarterly revenue, USD</div><svg id="bva" width="100%" height="245"></svg></div>
+   <div class="card"><h3>Gross Margin & Burn</h3><div class="sub">Gross margin % (line) vs. monthly net burn $K (bars)</div><svg id="gm" width="100%" height="245"></svg></div>
+   <div class="card"><h3>Top Regions</h3><div class="sub">Dec-26 ARR, YoY vs Dec-25, avg monthly logo churn</div><table id="reg"></table></div>
+  </div>
+  <div class="foot"><span>Sources: billing_subscription_export.xlsx · crm_customers.xlsx · finance_gl_budget.xlsx (synthetic) · Model: fact_MRR, fact_MRR_Movements, fact_GL, fact_Budget, dim_Customer, dim_Product, dim_Date</span><span>Period: Jan–Dec 2026 · Reconciled to GL ✓</span></div>
+ </div>
+</div>
+<script>
+const D=/*__DATA__*/;
+/*__HELPERS__*/
+const M=D.months, mrr=D.mrr, newM=D.new, exp=D.exp, ch=D.churn_contr;
+// KPIs
+const yoy=D.arr/D.arr_dec25-1, gm=D.gm, chg=(D.logo_churn_h2-D.logo_churn_h1)*100;
+const kpis=[["ARR",money(D.arr),"▲ "+pct(yoy)+" vs Dec-25","up"],
+ ["MRR",money(D.mrr[11]*1000),"▲ "+money(D.mrr_mom)+" MoM","up"],
+ ["Net Revenue Retention",pct(D.nrr),"GRR "+pct(D.grr)+" · Dec-25 cohort","up"],
+ ["Gross Margin",pct(gm[11]),"▲ "+((gm[11]-gm[0])*100).toFixed(1)+" pts vs Jan","up"],
+ ["Logo Churn (monthly)",pct(D.logo_churn,2),"▲ "+chg.toFixed(2)+" pts H2 vs H1","dn"],
+ ["Cash Runway",D.runway_dec.toFixed(1)+" mo",money(D.cash_dec)+" cash · "+(D.runway_dec-D.runway_jun).toFixed(1)+" mo vs Jun","dn"]];
+document.getElementById("kpis").innerHTML=kpis.map(([a,b,c,d])=>`<div class="card kpi"><small>${a}</small><div class="v">${b}</div><div class="d ${d}">${c}</div></div>`).join("");
+// MRR combo
+(function(){const s=document.getElementById("mrr"),W=s.clientWidth,H=240,L=46,R=46,T=10,B=22,w=W-L-R,h=H-T-B;
+ const lo=-100,hi=200,yb=v=>T+h*(1-(v-lo)/(hi-lo));
+ const yl=v=>T+h*(1-(v-1500)/(3100-1500));
+ [-100,-50,0,50,100,150,200].forEach(v=>{el("line",{x1:L,x2:W-R,y1:yb(v),y2:yb(v),stroke:v==0?"#c8c6c4":"#f0efee"},s);txt(s,L-6,yb(v)+3,v+"K",{"text-anchor":"end"})});
+ [1500,1900,2300,2700,3100].forEach(v=>txt(s,W-R+6,yl(v)+3,"$"+(v/1000).toFixed(1)+"M"));
+ const bw=w/12;for(let i=0;i<12;i++){const x=L+bw*i+bw*.22,bwi=bw*.56;
+  el("rect",{x,y:yb(newM[i]),width:bwi,height:yb(0)-yb(newM[i]),fill:css("--a")},s);
+  el("rect",{x,y:yb(newM[i]+exp[i]),width:bwi,height:yb(0)-yb(exp[i]),fill:"#7fc4ff"},s);
+  el("rect",{x,y:yb(0),width:bwi,height:yb(ch[i])-yb(0),fill:css("--c")},s);
+  txt(s,L+bw*i+bw/2,H-6,M[i],{"text-anchor":"middle"})}
+ const pts=mrr.map((v,i)=>[L+bw*i+bw/2,yl(v)]);
+ el("polyline",{points:pts.map(p=>p.join(",")).join(" "),fill:"none",stroke:css("--b"),"stroke-width":2.5},s);
+ pts.forEach(p=>el("circle",{cx:p[0],cy:p[1],r:3,fill:css("--b")},s));
+ txt(s,pts[11][0]-4,pts[11][1]-8,money(mrr[11]*1000),{"text-anchor":"end","font-weight":600,fill:css("--b"),"font-size":11})})();
+// donut
+(function(){const s=document.getElementById("donut"),W=s.clientWidth,cx=W/2,cy=105,r=78,ri=50;
+ const t=D.tier,d=[["Enterprise",t["Enterprise"],css("--b")],["Growth",t["Growth"],css("--a")],["Starter",t["Starter"],css("--c")],["Add-ons",t["Add-on"],css("--d")]];let a=-Math.PI/2;
+ d.forEach(([n,v,c])=>{const a2=a+v*2*Math.PI,lg=v>.5?1:0,p=(q,rr)=>[cx+rr*Math.cos(q),cy+rr*Math.sin(q)];
+  const [x1,y1]=p(a,r),[x2,y2]=p(a2,r),[x3,y3]=p(a2,ri),[x4,y4]=p(a,ri);
+  el("path",{d:`M${x1},${y1}A${r},${r} 0 ${lg} 1 ${x2},${y2}L${x3},${y3}A${ri},${ri} 0 ${lg} 0 ${x4},${y4}Z`,fill:c,stroke:"#fff","stroke-width":2},s);a=a2});
+ txt(s,cx,cy-2,money(D.arr),{"text-anchor":"middle","font-size":16,"font-weight":600,fill:"#252423"});txt(s,cx,cy+14,"Total ARR",{"text-anchor":"middle"});
+ d.forEach(([n,v,c],i)=>{const x=14+(i%2)*(W/2),y=205+Math.floor(i/2)*20;el("rect",{x,y:y-8,width:9,height:9,rx:2,fill:c},s);txt(s,x+14,y,`${n}  ${pct(v)}`,{fill:"#252423","font-size":11})})})();
+// unit economics
+(function(){const s=document.getElementById("unit"),W=s.clientWidth,L=82,U=D.unit;
+ txt(s,0,14,"CAC payback (months)",{"font-weight":600,fill:"#252423","font-size":11});
+ U.forEach((u,i)=>{const y=26+i*26,bw=(W-L-46)*u.CAC_Payback_Months/24;txt(s,0,y+12,u.Segment,{fill:"#252423","font-size":11});el("rect",{x:L,y,width:bw,height:16,rx:2,fill:css("--a")},s);txt(s,L+bw+5,y+12,u.CAC_Payback_Months.toFixed(1)+" mo",{"font-size":11,fill:"#252423"})});
+ txt(s,0,128,"LTV : CAC ratio",{"font-weight":600,fill:"#252423","font-size":11});
+ const sc=x=>L+(W-L-46)*x/6,x3=sc(3);
+ U.forEach((u,i)=>{const y=140+i*26,bw=sc(u.LTV_to_CAC)-L;txt(s,0,y+12,u.Segment,{fill:"#252423","font-size":11});el("rect",{x:L,y,width:bw,height:16,rx:2,fill:css("--b")},s);txt(s,L+bw+5,y+12,u.LTV_to_CAC.toFixed(1)+"x",{"font-size":11,fill:"#252423"})});
+ el("line",{x1:x3,x2:x3,y1:134,y2:222,stroke:css("--c"),"stroke-dasharray":"4 3"},s);txt(s,x3+3,232,"3x target",{fill:css("--c")})})();
+// budget vs actual
+(function(){const s=document.getElementById("bva"),W=s.clientWidth,H=245,L=40,T=12,B=40,h=H-T-B,w=W-L-8;
+ const bud=D.bva.budget,act=D.bva.actual,max=10000,y=v=>T+h*(1-v/max);
+ [0,2000,4000,6000,8000,10000].forEach(v=>{el("line",{x1:L,x2:W-8,y1:y(v),y2:y(v),stroke:"#f0efee"},s);txt(s,L-5,y(v)+3,"$"+v/1000+"M",{"text-anchor":"end"})});
+ const gw=w/4;bud.forEach((b,i)=>{const x=L+gw*i+gw*.15,bw=gw*.33;
+  el("rect",{x,y:y(b),width:bw,height:y(0)-y(b),fill:"#c8c6c4"},s);el("rect",{x:x+bw+2,y:y(act[i]),width:bw,height:y(0)-y(act[i]),fill:css("--a")},s);
+  const v=(act[i]/b-1)*100;txt(s,L+gw*i+gw/2,H-24,"Q"+(i+1),{"text-anchor":"middle",fill:"#252423"});
+  txt(s,L+gw*i+gw/2,H-10,(v>=0?"+":"")+v.toFixed(1)+"%",{"text-anchor":"middle","font-weight":600,fill:v>=0?css("--good"):css("--bad")})});
+ el("rect",{x:W-112,y:2,width:9,height:9,fill:"#c8c6c4"},s);txt(s,W-99,10,"Budget");el("rect",{x:W-58,y:2,width:9,height:9,fill:css("--a")},s);txt(s,W-45,10,"Actual")})();
+// gross margin & burn
+(function(){const s=document.getElementById("gm"),W=s.clientWidth,H=245,L=34,R=34,T=12,B=22,h=H-T-B,w=W-L-R;
+ const g=D.gm.map(x=>x*100),burn=D.burn;
+ const yb=v=>T+h*(1-v/500),yl=v=>T+h*(1-(v-70)/12),bw=w/12;
+ [0,100,200,300,400,500].forEach(v=>{el("line",{x1:L,x2:W-R,y1:yb(v),y2:yb(v),stroke:"#f0efee"},s);txt(s,L-4,yb(v)+3,v,{"text-anchor":"end"})});
+ [70,74,78,82].forEach(v=>txt(s,W-R+4,yl(v)+3,v+"%"));
+ burn.forEach((v,i)=>{el("rect",{x:L+bw*i+bw*.2,y:yb(v),width:bw*.6,height:yb(0)-yb(v),fill:"#d7d5f0"},s);txt(s,L+bw*i+bw/2,H-6,M[i][0],{"text-anchor":"middle"})});
+ el("polyline",{points:g.map((v,i)=>[L+bw*i+bw/2,yl(v)].join(",")).join(" "),fill:"none",stroke:css("--d"),"stroke-width":2.5},s);
+ txt(s,L+bw*11.5,yl(g[11])-8,g[11].toFixed(1)+"%",{"text-anchor":"end","font-weight":600,fill:css("--d"),"font-size":11})})();
+// regions
+(function(){const r=D.regions,mx=Math.max(...r.map(x=>x.ARR)),tot=r.reduce((s,x)=>s+x.ARR,0);
+ document.getElementById("reg").innerHTML=`<tr><th>Region</th><th>ARR</th><th class="n">YoY</th><th class="n">Churn</th></tr>`+
+  r.map(x=>`<tr><td>${x.Region}</td><td><span class="bar" style="width:${Math.round(x.ARR/mx*70)}px"></span> ${money(x.ARR)}</td><td class="n up">▲ ${pct(x.YoY)}</td><td class="n ${x.LogoChurn>D.logo_churn?'dn':''}">${pct(x.LogoChurn,2)}</td></tr>`).join("")+
+  `<tr><td><b>Total</b></td><td><b>${money(tot)}</b></td><td class="n up"><b>▲ ${pct(yoy)}</b></td><td class="n"><b>${pct(D.logo_churn,2)}</b></td></tr>`})();
+</script></body></html>

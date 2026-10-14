@@ -1,0 +1,83 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Decomposition Tree</title>
+<style>/*__CSS__*/
+.trow{display:grid;grid-template-columns:1fr 330px;gap:12px;flex:1;min-height:0}
+.tcard{display:flex;flex-direction:column}
+.tcard svg{flex:1}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:6px 0 12px}
+.kv div{background:#faf9f8;border-radius:4px;padding:7px 9px}
+.kv small{display:block;font-size:10px;color:var(--muted)}
+.kv b{font-size:17px;font-weight:600}
+</style></head><body>
+<div class="frame">
+ __NAV__
+ <div class="main">
+  <div class="top">
+   <div class="title"><h1>Decomposition Tree — What Drives ARR and Churn?</h1><p>FY2026 · Expand any node to drill into the next dimension · Highlighted path = largest contributor at each level</p></div>
+   <div class="slicers">
+    <div class="sl"><small>Fiscal Year</small><b>FY2026</b></div>
+    <div class="sl"><small>Snapshot</small><b>Dec-2026</b></div>
+    <div class="sl"><small>Split mode</small><b>High value</b></div>
+   </div>
+  </div>
+  <div class="trow">
+   <div class="card tcard"><h3>Analyze: ARR (Dec-2026) &nbsp;·&nbsp; Explain by: Region → Country → Segment → Industry</h3><div class="sub">Bar length = share of the parent node</div><svg id="t1"></svg></div>
+   <div class="card"><h3>Key findings — ARR</h3><div class="sub">Generated from the tree path</div><div class="kv" id="k1"></div><ul class="insight" id="i1"></ul></div>
+  </div>
+  <div class="trow">
+   <div class="card tcard"><h3>Analyze: Churned MRR (FY2026) &nbsp;·&nbsp; Explain by: Segment → Region → Industry → Acquisition channel</h3><div class="sub">MRR lost from customers that cancelled during the year</div><svg id="t2"></svg></div>
+   <div class="card"><h3>Key findings — Churn</h3><div class="sub">Generated from the tree path</div><div class="kv" id="k2"></div><ul class="insight" id="i2"></ul></div>
+  </div>
+  <div class="foot"><span>Visual: Power BI Decomposition Tree · Measures: [ARR], [Churned MRR] · Dimensions from dim_Customer</span><span>Period: Jan–Dec 2026 · Reconciled to GL ✓</span></div>
+ </div>
+</div>
+<script>
+const D=/*__DATA__*/;
+/*__HELPERS__*/
+const NAMES={Region:"Region",Country:"Country",Segment:"Segment",Industry:"Industry",AcquisitionChannel:"Acq. channel"};
+function drawTree(id,T,rootLabel,colorSel,colorBar){
+ const s=document.getElementById(id),W=s.clientWidth,H=s.clientHeight;
+ const cols=T.levels.length+1,cw=W/cols,nw=cw-46,nh=34,gap=6,top=26;
+ // root
+ const rootY=top+((Math.max(...T.levels.map(l=>l.nodes.length))*(nh+gap))-nh)/2;
+ txt(s,0,12,rootLabel,{"font-weight":600,fill:"#252423","font-size":11});
+ let px=0,py=rootY,pval=T.total;
+ node(s,0,rootY,nw,nh,rootLabel,T.total,1,true,colorSel);
+ T.levels.forEach((L,li)=>{
+  const x=cw*(li+1);
+  txt(s,x,12,(NAMES[L.level]||L.level)+"  ⌄",{"font-weight":600,fill:"#252423","font-size":11});
+  const h=L.nodes.length*(nh+gap)-gap,y0=Math.max(top,Math.min(py+nh/2-h/2,H-h-4));
+  let selY=0;
+  L.nodes.forEach((n,i)=>{const y=y0+i*(nh+gap),sel=n.label===L.selected;
+   const sx=px+nw+2,sy=py+nh/2+2,ex=x-2,ey=y+nh/2+2,mx=(sx+ex)/2;
+   el("path",{d:`M${sx},${sy} C${mx},${sy} ${mx},${ey} ${ex},${ey}`,fill:"none",stroke:sel?colorSel:"#c8c6c4","stroke-width":sel?2:1},s);
+   node(s,x,y,nw,nh,n.label,n.value,n.value/pval,sel,sel?colorSel:colorBar);
+   if(sel)selY=y;});
+  const selNode=L.nodes.find(n=>n.label===L.selected);px=x;py=selY;pval=selNode.value;
+ });
+}
+function node(s,x,y,w,h,label,v,share,sel,col){
+ el("rect",{x,y,width:w,height:h,rx:3,fill:sel?"#f3f6fd":"#fff",stroke:sel?col:"#e1dfdd","stroke-width":sel?1.5:1},s);
+ const lb=label.length>17?label.slice(0,16)+"…":label;
+ txt(s,x+6,y+13,lb,{fill:"#252423","font-size":10.5,"font-weight":sel?600:400});
+ txt(s,x+w-6,y+13,money(v),{"text-anchor":"end",fill:"#252423","font-size":10.5,"font-weight":600});
+ el("rect",{x:x+6,y:y+19,width:w-12,height:8,rx:2,fill:"#edebe9"},s);
+ el("rect",{x:x+6,y:y+19,width:Math.max(2,(w-12)*share),height:8,rx:2,fill:col},s);
+ if(share<1)txt(s,x+w-6,y+h-1,"",{});
+}
+drawTree("t1",D.arr_tree,"ARR",css("--b"),css("--a"));
+drawTree("t2",D.churn_tree,"Churned MRR",css("--c"),"#f2a77f");
+function findings(T,kid,iid,kpis,unitLabel){
+ document.getElementById(kid).innerHTML=kpis.map(([a,b])=>`<div><small>${a}</small><b>${b}</b></div>`).join("");
+ let parent=T.total,parentName=unitLabel,li=[];
+ T.levels.forEach(L=>{const n=L.nodes.find(x=>x.label===L.selected),sh=n.value/parent;
+  li.push(`<li><b>${n.label}</b> is the largest ${(NAMES[L.level]||L.level).toLowerCase()} within ${parentName}: <b>${money(n.value)}</b> (${pct(sh)}).</li>`);
+  parent=n.value;parentName=n.label;});
+ document.getElementById(iid).innerHTML=li.join("");
+}
+const c=D.cust,mvLost=D.churn_tree.total;
+findings(D.arr_tree,"k1","i1",[["Total ARR",money(D.arr)],["Largest path share",pct(D.arr_tree.levels[3].nodes[0].value/D.arr)]],"total ARR");
+document.getElementById("i1").insertAdjacentHTML("beforeend",`<li><span class="pill">Action</span>Enterprise in the US carries the most ARR from the fewest logos — protect it with named CSM coverage.</li>`);
+findings(D.churn_tree,"k2","i2",[["Churned MRR",money(mvLost)],["Churned logos",num(c.churned_logos.reduce((a,b)=>a+b,0))]],"churned MRR");
+document.getElementById("i2").insertAdjacentHTML("beforeend",`<li><span class="pill o">Action</span>SMB churn is spread across industries — fix onboarding for the whole segment rather than one vertical.</li>`);
+</script></body></html>

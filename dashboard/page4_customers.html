@@ -1,0 +1,82 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Customer Insights</title>
+<style>/*__CSS__*/
+.g4{display:grid;grid-template-columns:1.45fr 1fr 1fr;grid-template-rows:auto minmax(0,1fr);gap:12px;flex:1;min-height:0}
+.g4 .card{overflow:hidden}
+#top td{padding:4px 4px;font-size:11px;white-space:nowrap}#top th{padding:4px}
+td .ab{display:inline-block;height:9px;border-radius:2px;vertical-align:middle;margin-right:5px;background:var(--b)}
+td.c,th.c{text-align:center}
+.rk{display:inline-block;width:18px;height:18px;border-radius:50%;background:#e8ecfa;color:#12239e;text-align:center;line-height:18px;font-size:10px;font-weight:600}
+.risk td{padding:3px 4px;font-size:11px}
+</style></head><body>
+<div class="frame">
+ __NAV__
+ <div class="main">
+  <div class="top">
+   <div class="title"><h1>Customer Insights</h1><p>FY2026 · Who our biggest customers are, how cohorts retain, and who is at risk</p></div>
+   <div class="slicers">
+    <div class="sl"><small>Fiscal Year</small><b>FY2026</b></div>
+    <div class="sl"><small>Region</small><b>All</b></div>
+    <div class="sl"><small>Segment</small><b>All</b></div>
+    <div class="sl"><small>Industry</small><b>All</b></div>
+   </div>
+  </div>
+  <div class="kpis" id="kpis"></div>
+  <div class="g4">
+   <div class="card"><h3>Top 10 Customers by ARR</h3><div class="sub">Dec-2026 · all Enterprise · YoY vs Dec-2025 · tenure in months since signup</div><table id="top"></table></div>
+   <div class="card" style="grid-column:2/4"><h3>Cohort Revenue Retention</h3><div class="sub">Customers acquired each month of FY2026 · MRR in later months as % of their first-month MRR (above 100% = expansion outweighs churn)</div><svg id="coh" width="100%" height="290"></svg></div>
+   <div class="card"><h3>Active Customers</h3><div class="sub">Month-end paying customers (line) · new and churned logos (bars)</div>
+    <div class="legend"><span><i style="background:var(--b)"></i>Active</span><span><i style="background:var(--a)"></i>New logos</span><span><i style="background:var(--c)"></i>Churned logos</span></div><svg id="act" width="100%" height="190"></svg></div>
+   <div class="card"><h3>ARR by Industry</h3><div class="sub">Dec-2026, $M</div><svg id="ind" width="100%" height="225"></svg></div>
+   <div class="card"><h3>At-Risk Watchlist</h3><div class="sub">Still paying, but MRR down vs Sep-26 (constant currency) · largest $ drop first</div><table id="risk" class="risk"></table></div>
+  </div>
+  <div class="foot"><span>Sources: billing_subscription_export.xlsx, crm_customers.xlsx · Measures: [ARR], [Customer ARR Rank], [Top 10 Concentration %], [Cohort Revenue Retention %], [Is At Risk]</span><span>Period: Jan–Dec 2026 · Reconciled to GL ✓</span></div>
+ </div>
+</div>
+<script>
+const D=/*__DATA__*/;
+/*__HELPERS__*/
+const C=D.cust,newL=C.new_logos.reduce((a,b)=>a+b,0),chL=C.churned_logos.reduce((a,b)=>a+b,0);
+const k=[["Active Customers",num(C.active),`▲ ${num(C.active-C.active_dec25)} vs Dec-25`,"up"],
+ ["ARPA (monthly)",money(C.arpa),"Dec MRR ÷ active customers",""],
+ ["Top-10 Concentration",pct(C.top10_share),"of total ARR in 10 accounts",""],
+ ["New Logos",num(newL),"acquired in FY2026","up"],
+ ["Churned Logos",num(chL),pct(chL/C.active_dec25,1)+" of opening base","dn"],
+ ["At-Risk Customers",num(C.risk_n),money(C.risk_arr)+" ARR contracting","dn"]];
+document.getElementById("kpis").innerHTML=k.map(([a,b,c,d])=>`<div class="card kpi"><small>${a}</small><div class="v">${b}</div><div class="d ${d}" style="${d?'':'color:#605e5c'}">${c}</div></div>`).join("");
+// top 10
+const mx=C.top10[0].arr;
+document.getElementById("top").innerHTML=`<tr><th class="c">#</th><th>Customer</th><th>Region</th><th>Industry</th><th>Owner</th><th class="n">Prod.</th><th class="n">Tenure</th><th>ARR</th><th class="n">YoY</th></tr>`+
+ C.top10.map(t=>`<tr><td class="c"><span class="rk">${t.rank}</span></td><td><b style="font-weight:600">${t.name}</b></td><td>${t.region.replace("North America","N. America")}</td><td>${t.industry.replace("Professional Services","Prof. Services").replace("Financial Services","Fin. Services")}</td><td style="color:#605e5c">${t.owner.split(" ")[0]}</td>
+ <td class="n">${t.products}</td><td class="n">${t.tenure}m</td><td><span class="ab" style="width:${Math.round(t.arr/mx*56)}px"></span>${money(t.arr)}</td>
+ <td class="n ${t.yoy===null?'':t.yoy>0?'up':t.yoy<0?'dn':''}">${t.yoy===null?'<span class="pill g">New</span>':(t.yoy>0?'▲ ':t.yoy<0?'▼ ':'')+pct(Math.abs(t.yoy),0)}</td></tr>`).join("");
+// cohort heatmap
+(function(){const s=document.getElementById("coh"),W=s.clientWidth,L=78,T=22,cw=(W-L-8)/12,ch=20.5;
+ for(let j=0;j<12;j++)txt(s,L+cw*j+cw/2,14,"M"+j,{"text-anchor":"middle","font-weight":600});
+ const col=v=>{if(v>=1){const t=Math.min((v-1)/.2,1);return `rgb(${Math.round(232-200*t)},${Math.round(240-150*t)},${Math.round(255-40*t)})`}
+  const t=Math.min((1-v)/.2,1);return `rgb(${Math.round(253-23*t)},${Math.round(240-130*t)},${Math.round(234-180*t)})`};
+ C.cohorts.forEach((c,i)=>{const y=T+i*ch;txt(s,L-6,y+14,`${c.cohort} (${c.n})`,{"text-anchor":"end",fill:"#252423","font-size":10.5});
+  c.ret.forEach((v,j)=>{const x=L+cw*j;el("rect",{x:x+1,y:y+1,width:cw-2,height:ch-2,rx:2,fill:j==0?"#e1dfdd":col(v)},s);
+   txt(s,x+cw/2,y+14,(v*100).toFixed(0)+"%",{"text-anchor":"middle","font-size":10,fill:(v>1.12||v<.88)&&j>0?"#fff":"#252423"})})});
+ const y=T+12*ch+12;txt(s,L,y,"Months since acquisition →  ·  cohort (customers acquired)",{"font-size":9.5})})();
+// active customers
+(function(){const s=document.getElementById("act"),W=s.clientWidth,H=190,L=34,R=40,T=8,B=20,h=H-T-B,w=W-L-R,bw=w/12;
+ const yb=v=>T+h*(1-v/80),yl=v=>T+h*(1-(v-700)/(1300-700));
+ [0,20,40,60,80].forEach(v=>{el("line",{x1:L,x2:W-R,y1:yb(v),y2:yb(v),stroke:"#f0efee"},s);txt(s,L-4,yb(v)+3,v,{"text-anchor":"end"})});
+ [700,900,1100,1300].forEach(v=>txt(s,W-R+4,yl(v)+3,num(v)));
+ for(let i=0;i<12;i++){const x=L+bw*i;el("rect",{x:x+bw*.14,y:yb(C.new_logos[i]),width:bw*.34,height:yb(0)-yb(C.new_logos[i]),fill:css("--a")},s);
+  el("rect",{x:x+bw*.52,y:yb(C.churned_logos[i]),width:bw*.34,height:yb(0)-yb(C.churned_logos[i]),fill:css("--c")},s);
+  txt(s,x+bw/2,H-6,D.months[i][0],{"text-anchor":"middle"})}
+ const pts=C.active_series.map((v,i)=>[L+bw*i+bw/2,yl(v)]);
+ el("polyline",{points:pts.map(p=>p.join(",")).join(" "),fill:"none",stroke:css("--b"),"stroke-width":2.5},s);
+ pts.forEach(p=>el("circle",{cx:p[0],cy:p[1],r:2.6,fill:css("--b")},s));
+ txt(s,pts[11][0]-3,pts[11][1]-7,num(C.active),{"text-anchor":"end","font-weight":600,fill:css("--b"),"font-size":11})})();
+// industry
+(function(){const s=document.getElementById("ind"),W=s.clientWidth,L=124,bh=15,g=6,m=C.industry[0].value;
+ C.industry.forEach((x,i)=>{const y=4+i*(bh+g),bw=(W-L-50)*x.value/m;txt(s,L-6,y+12,x.label,{"text-anchor":"end",fill:"#252423","font-size":10.5});
+  el("rect",{x:L,y,width:bw,height:bh,rx:2,fill:i<3?css("--b"):css("--a")},s);txt(s,L+bw+4,y+12,"$"+x.value.toFixed(2)+"M",{"font-size":10.5,fill:"#252423"})})})();
+// risk
+document.getElementById("risk").innerHTML=`<tr><th>Customer</th><th class="n">ARR</th><th class="n">Δ 3m</th></tr>`+
+ C.risk.slice(0,5).map(r=>`<tr><td><b style="font-weight:600">${r.name}</b><br><span style="color:#605e5c;font-size:10px">${r.seg} · ${r.owner}</span></td><td class="n">${money(r.arr)}</td><td class="n dn">▼ ${pct(Math.abs(r.change),0)}</td></tr>`).join("")+
+ `<tr><td colspan="3" style="color:#605e5c;font-size:10.5px;border:0;padding-top:8px">+ ${C.risk_n-5} more · ${money(C.risk_arr)} total ARR on the watchlist</td></tr>`;
+</script></body></html>

@@ -1,0 +1,1124 @@
+{
+ "months": [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec"
+ ],
+ "mrr": [
+  1896.0061879007199,
+  2003.6566521696702,
+  2097.02340811283,
+  2196.16455512124,
+  2318.74695632955,
+  2420.2551440294,
+  2532.12464039551,
+  2594.91383031365,
+  2697.82295796199,
+  2828.03988712029,
+  2889.746435013529,
+  2985.76379245625
+ ],
+ "new": [
+  67.0324513602,
+  91.41275706418001,
+  75.58523837739999,
+  71.44767939584001,
+  85.90015616052999,
+  79.14795003079,
+  109.48883096269,
+  79.88134191322999,
+  90.39119285731,
+  84.86261846622001,
+  92.99541354181999,
+  86.60772709996
+ ],
+ "exp": [
+  44.338861066540005,
+  43.59590902396001,
+  36.40420588645,
+  41.4763470733,
+  55.635521047980006,
+  45.63950202268,
+  32.93691252478,
+  41.47356678124001,
+  57.26167865722999,
+  68.1426081556,
+  52.51468516539,
+  45.54848430062
+ ],
+ "churn_contr": [
+  -11.23937309976,
+  -21.57278976657,
+  -17.27673599013,
+  -14.84882800307,
+  -20.33265851609,
+  -32.47271518331,
+  -37.744420886040004,
+  -60.76639456139001,
+  -49.24810041191,
+  -25.06946836305,
+  -80.43112458574998,
+  -33.01365474495
+ ],
+ "fx": [
+  -4.4669339358000215,
+  -5.78541205261993,
+  -1.345952330560078,
+  1.0659485423400201,
+  1.3793825158900055,
+  9.193450829690038,
+  7.188173764679945,
+  2.200675785059987,
+  4.504356545709972,
+  2.2811708995300846,
+  -3.3724262282200494,
+  -3.1251992129099655
+ ],
+ "opening_mrr_dec25": 1800341.18250954,
+ "arr": 35829165.509475,
+ "arr_dec25": 21604094.190114483,
+ "mrr_mom": 96017.3574427208,
+ "nrr": 1.0850987592072028,
+ "grr": 0.8631270123488638,
+ "logo_churn": 0.022247543063986575,
+ "logo_churn_h1": 0.01994162240225554,
+ "logo_churn_h2": 0.02455346372571761,
+ "gm": [
+  0.7586180876339861,
+  0.7620161518192251,
+  0.7653367827686768,
+  0.7681439682279547,
+  0.769421200664345,
+  0.7724623735330648,
+  0.775413243480779,
+  0.7794376933125368,
+  0.7822191008412205,
+  0.7837267599503344,
+  0.7868144202991041,
+  0.789060691234386
+ ],
+ "gm_fy": 0.7757252481907965,
+ "burn": [
+  419.99893000000014,
+  419.4203799999999,
+  405.49744000000015,
+  385.48814000000016,
+  381.80197999999996,
+  372.07936999999964,
+  351.32425999999975,
+  341.3724199999999,
+  338.9929199999999,
+  321.8435800000001,
+  311.7780500000003,
+  298.4187199999997
+ ],
+ "runway_dec": 25.11259456739185,
+ "runway_jun": 25.71346831483087,
+ "cash_dec": 7801983.81,
+ "tier": {
+  "Add-on": 0.06768550045597461,
+  "Enterprise": 0.4322520392487347,
+  "Growth": 0.3371588005904692,
+  "Starter": 0.1629036597048214
+ },
+ "unit": [
+  {
+   "Segment": "SMB",
+   "SM_Spend": 1709891.24,
+   "NewLogos": 486,
+   "CAC": 3518.294732510288,
+   "NewARPA": 496.06555370660504,
+   "MonthlyLogoChurn": 0.027070988730103406,
+   "LifetimeMonths": 36.93991416309013,
+   "LTV": 14214.86960097786,
+   "CAC_Payback_Months": 9.14292632064959,
+   "LTV_to_CAC": 4.040272541588808
+  },
+  {
+   "Segment": "Mid-Market",
+   "SM_Spend": 4456880.35,
+   "NewLogos": 138,
+   "CAC": 32296.234420289853,
+   "NewARPA": 2938.5585505075364,
+   "MonthlyLogoChurn": 0.011866235167206042,
+   "LifetimeMonths": 60.0,
+   "LTV": 136770.84365493877,
+   "CAC_Payback_Months": 14.168034746544599,
+   "LTV_to_CAC": 4.234885153329627
+  },
+  {
+   "Segment": "Enterprise",
+   "SM_Spend": 5430712.9,
+   "NewLogos": 23,
+   "CAC": 236117.95217391307,
+   "NewARPA": 16006.279050379131,
+   "MonthlyLogoChurn": 0.007032348804500703,
+   "LifetimeMonths": 60.0,
+   "LTV": 744988.4873379898,
+   "CAC_Payback_Months": 19.01650477990192,
+   "LTV_to_CAC": 3.1551539409814437
+  }
+ ],
+ "bva": {
+  "budget": [
+   5915.0,
+   6992.0,
+   7670.0,
+   8533.0
+  ],
+  "actual": [
+   5996.6862481832195,
+   6935.1666554801905,
+   7824.86142867115,
+   8703.550114590069
+  ]
+ },
+ "regions": [
+  {
+   "Region": "North America",
+   "ARR": 18015821.585309282,
+   "YoY": 0.5898469089432448,
+   "LogoChurn": 0.022577553317185074
+  },
+  {
+   "Region": "EMEA",
+   "ARR": 9196941.62538372,
+   "YoY": 0.7917927183887523,
+   "LogoChurn": 0.023305623571350714
+  },
+  {
+   "Region": "APAC",
+   "ARR": 6003504.67890948,
+   "YoY": 0.8799187493442253,
+   "LogoChurn": 0.02257457995031863
+  },
+  {
+   "Region": "LATAM",
+   "ARR": 2612897.61987252,
+   "YoY": 0.34270827883513677,
+   "LogoChurn": 0.014558197790251186
+  }
+ ],
+ "recon": {
+  "raw_rows": 18575,
+  "dup_rows": 57,
+  "test_rows": 18,
+  "test_local": 18.0,
+  "model_rows": 18500,
+  "customers_crm": 1483,
+  "customers_billed": 1483,
+  "fy_model_rev": 29460264.446924627,
+  "fy_gl_rev": 29460264.46,
+  "rollforward_max_abs": 9.313225746154785e-10,
+  "fy_budget": 29110000.0
+ },
+ "arr_tree": {
+  "total": 35829165.509475,
+  "levels": [
+   {
+    "level": "Region",
+    "nodes": [
+     {
+      "label": "North America",
+      "value": 18015821.585309282
+     },
+     {
+      "label": "EMEA",
+      "value": 9196941.62538372
+     },
+     {
+      "label": "APAC",
+      "value": 6003504.67890948
+     },
+     {
+      "label": "LATAM",
+      "value": 2612897.6198725197
+     }
+    ],
+    "selected": "North America"
+   },
+   {
+    "level": "Country",
+    "nodes": [
+     {
+      "label": "United States",
+      "value": 14519172.0
+     },
+     {
+      "label": "Canada",
+      "value": 3496649.58530928
+     }
+    ],
+    "selected": "United States"
+   },
+   {
+    "level": "Segment",
+    "nodes": [
+     {
+      "label": "Enterprise",
+      "value": 6773244.0
+     },
+     {
+      "label": "Mid-Market",
+      "value": 5371464.0
+     },
+     {
+      "label": "SMB",
+      "value": 2374464.0
+     }
+    ],
+    "selected": "Enterprise"
+   },
+   {
+    "level": "Industry",
+    "nodes": [
+     {
+      "label": "Healthcare",
+      "value": 1510068.0
+     },
+     {
+      "label": "Manufacturing",
+      "value": 1201944.0
+     },
+     {
+      "label": "Financial Services",
+      "value": 740496.0
+     },
+     {
+      "label": "Energy",
+      "value": 652152.0
+     },
+     {
+      "label": "Hospitality",
+      "value": 646344.0
+     },
+     {
+      "label": "Logistics",
+      "value": 627804.0
+     },
+     {
+      "label": "Other (3)",
+      "value": 1394436.0
+     }
+    ],
+    "selected": "Healthcare"
+   }
+  ]
+ },
+ "churn_tree": {
+  "total": 333455.4285522,
+  "levels": [
+   {
+    "level": "Segment",
+    "nodes": [
+     {
+      "label": "SMB",
+      "value": 134978.57631671
+     },
+     {
+      "label": "Mid-Market",
+      "value": 113700.02371366
+     },
+     {
+      "label": "Enterprise",
+      "value": 84776.82852183
+     }
+    ],
+    "selected": "SMB"
+   },
+   {
+    "level": "Region",
+    "nodes": [
+     {
+      "label": "North America",
+      "value": 68188.15203346
+     },
+     {
+      "label": "EMEA",
+      "value": 38641.25804544
+     },
+     {
+      "label": "APAC",
+      "value": 22097.3694656
+     },
+     {
+      "label": "LATAM",
+      "value": 6051.79677221
+     }
+    ],
+    "selected": "North America"
+   },
+   {
+    "level": "Industry",
+    "nodes": [
+     {
+      "label": "Energy",
+      "value": 9418.19992806
+     },
+     {
+      "label": "Healthcare",
+      "value": 7743.41030656
+     },
+     {
+      "label": "Media",
+      "value": 7699.02321248
+     },
+     {
+      "label": "Education",
+      "value": 7470.06287126
+     },
+     {
+      "label": "Professional Services",
+      "value": 7330.56583829
+     },
+     {
+      "label": "Logistics",
+      "value": 7215.55263406
+     },
+     {
+      "label": "Other (4)",
+      "value": 21311.33724275
+     }
+    ],
+    "selected": "Energy"
+   },
+   {
+    "level": "AcquisitionChannel",
+    "nodes": [
+     {
+      "label": "Outbound SDR",
+      "value": 3813.88437948
+     },
+     {
+      "label": "Partner",
+      "value": 3434.31554858
+     },
+     {
+      "label": "Inbound",
+      "value": 1389.0
+     },
+     {
+      "label": "Self-serve",
+      "value": 781.0
+     }
+    ],
+    "selected": "Outbound SDR"
+   }
+  ]
+ },
+ "sales": {
+  "reps": [
+   {
+    "id": "R09",
+    "name": "Amara Okafor",
+    "team": "EMEA",
+    "segs": "Mid-Market, Enterprise",
+    "new_arr": 1863559.65,
+    "quota": 2270000.0,
+    "attain": 0.8209513876651982,
+    "won": 25,
+    "lost": 83,
+    "win_rate": 0.23148148148148148,
+    "avg_deal": 74542.386,
+    "cycle": 81.64,
+    "book_nrr": 1.2188912900918472,
+    "book_arr": 5671838.07061968
+   },
+   {
+    "id": "R11",
+    "name": "Chloe Wright",
+    "team": "APAC",
+    "segs": "Mid-Market, Enterprise",
+    "new_arr": 1502884.7200000002,
+    "quota": 1470000.0,
+    "attain": 1.0223705578231295,
+    "won": 19,
+    "lost": 49,
+    "win_rate": 0.27941176470588236,
+    "avg_deal": 79099.1957894737,
+    "cycle": 73.21052631578948,
+    "book_nrr": 1.1819220970933055,
+    "book_arr": 4060911.1157572805
+   },
+   {
+    "id": "R06",
+    "name": "James O'Connor",
+    "team": "North America",
+    "segs": "Enterprise",
+    "new_arr": 1352520.0,
+    "quota": 1480000.0,
+    "attain": 0.9138648648648648,
+    "won": 6,
+    "lost": 15,
+    "win_rate": 0.2857142857142857,
+    "avg_deal": 225420.0,
+    "cycle": 124.83333333333333,
+    "book_nrr": 0.9894232887076957,
+    "book_arr": 4546018.28819568
+   },
+   {
+    "id": "R03",
+    "name": "Priya Nair",
+    "team": "North America",
+    "segs": "SMB, Mid-Market",
+    "new_arr": 1331123.3299999998,
+    "quota": 1600000.0,
+    "attain": 0.8319520812499999,
+    "won": 108,
+    "lost": 200,
+    "win_rate": 0.35064935064935066,
+    "avg_deal": 12325.216018518517,
+    "cycle": 37.73148148148148,
+    "book_nrr": 0.9627243280663976,
+    "book_arr": 3083587.54829496
+   },
+   {
+    "id": "R05",
+    "name": "Sofia Alvarez",
+    "team": "North America",
+    "segs": "Mid-Market, Enterprise",
+    "new_arr": 1324023.92,
+    "quota": 1300000.0,
+    "attain": 1.0184799384615384,
+    "won": 23,
+    "lost": 84,
+    "win_rate": 0.21495327102803738,
+    "avg_deal": 57566.257391304345,
+    "cycle": 71.52173913043478,
+    "book_nrr": 1.2500108880978498,
+    "book_arr": 5644668.93094536
+   },
+   {
+    "id": "R04",
+    "name": "Marcus Chen",
+    "team": "North America",
+    "segs": "Mid-Market",
+    "new_arr": 1021824.9299999999,
+    "quota": 990000.0,
+    "attain": 1.0321463939393938,
+    "won": 27,
+    "lost": 105,
+    "win_rate": 0.20454545454545456,
+    "avg_deal": 37845.36777777778,
+    "cycle": 63.666666666666664,
+    "book_nrr": 1.070327050473564,
+    "book_arr": 2783687.5688388003
+   },
+   {
+    "id": "R08",
+    "name": "Lucas Moreau",
+    "team": "EMEA",
+    "segs": "SMB, Mid-Market",
+    "new_arr": 1008964.3099999999,
+    "quota": 880000.0,
+    "attain": 1.1465503522727272,
+    "won": 94,
+    "lost": 204,
+    "win_rate": 0.31543624161073824,
+    "avg_deal": 10733.662872340425,
+    "cycle": 33.47872340425532,
+    "book_nrr": 1.019572814081521,
+    "book_arr": 2561298.14320236
+   },
+   {
+    "id": "R10",
+    "name": "Kenji Tanaka",
+    "team": "APAC",
+    "segs": "SMB, Mid-Market",
+    "new_arr": 987715.44,
+    "quota": 1150000.0,
+    "attain": 0.8588829913043478,
+    "won": 89,
+    "lost": 183,
+    "win_rate": 0.3272058823529412,
+    "avg_deal": 11097.92629213483,
+    "cycle": 31.93258426966292,
+    "book_nrr": 0.8753459936696968,
+    "book_arr": 1942593.5631522
+   },
+   {
+    "id": "R07",
+    "name": "Hannah Schmidt",
+    "team": "EMEA",
+    "segs": "SMB",
+    "new_arr": 472915.54,
+    "quota": 420000.0,
+    "attain": 1.1259893809523809,
+    "won": 80,
+    "lost": 297,
+    "win_rate": 0.21220159151193635,
+    "avg_deal": 5911.44425,
+    "cycle": 28.3375,
+    "book_nrr": 0.8962531632458094,
+    "book_arr": 963805.4115616801
+   },
+   {
+    "id": "R02",
+    "name": "Ethan Walker",
+    "team": "North America",
+    "segs": "SMB",
+    "new_arr": 438722.26,
+    "quota": 360000.0,
+    "attain": 1.2186729444444444,
+    "won": 72,
+    "lost": 138,
+    "win_rate": 0.34285714285714286,
+    "avg_deal": 6093.364722222223,
+    "cycle": 30.73611111111111,
+    "book_nrr": 0.8129794094706362,
+    "book_arr": 1039102.2042216001
+   },
+   {
+    "id": "R12",
+    "name": "Rafael Costa",
+    "team": "LATAM",
+    "segs": "SMB, Mid-Market, Enterprise",
+    "new_arr": 437763.59,
+    "quota": 430000.0,
+    "attain": 1.0180548604651163,
+    "won": 34,
+    "lost": 123,
+    "win_rate": 0.21656050955414013,
+    "avg_deal": 12875.399705882353,
+    "cycle": 34.55882352941177,
+    "book_nrr": 1.1341529186147763,
+    "book_arr": 2612897.61987252
+   },
+   {
+    "id": "R01",
+    "name": "Olivia Bennett",
+    "team": "North America",
+    "segs": "SMB",
+    "new_arr": 435022.63,
+    "quota": 530000.0,
+    "attain": 0.8207974150943397,
+    "won": 70,
+    "lost": 262,
+    "win_rate": 0.21084337349397592,
+    "avg_deal": 6214.609,
+    "cycle": 26.442857142857143,
+    "book_nrr": 0.9786545745344412,
+    "book_arr": 918757.0448128801
+   }
+  ],
+  "new_arr": 12177040.32,
+  "quota": 12880000.0,
+  "win_rate": 0.27071129707112973,
+  "avg_deal": 18820.773292117465,
+  "cycle": 38.81761978361669,
+  "deals_won": 647,
+  "deals_lost": 1743,
+  "reps_at_quota": 7,
+  "team_month": {
+   "North America": [
+    226.65407000000002,
+    640.40931,
+    617.22838,
+    352.03128999999996,
+    505.17489,
+    427.75056,
+    944.44078,
+    478.73526,
+    403.34529,
+    452.34734,
+    362.80617,
+    492.31372999999996
+   ],
+   "EMEA": [
+    464.86074999999994,
+    257.34048,
+    242.89942000000002,
+    397.26932,
+    209.31946,
+    404.16483,
+    137.86895,
+    156.32695,
+    88.08892999999999,
+    221.39163,
+    451.89481,
+    314.01397
+   ],
+   "APAC": [
+    89.28454,
+    150.26412,
+    40.03239,
+    88.9487,
+    306.31642000000005,
+    115.23144,
+    221.04670000000002,
+    201.02992,
+    513.93098,
+    320.5179,
+    218.67463,
+    225.32242000000002
+   ],
+   "LATAM": [
+    23.590049999999998,
+    48.93917,
+    6.86268,
+    19.12284,
+    9.99111,
+    2.6285700000000003,
+    10.509529999999998,
+    122.484,
+    79.32914,
+    24.09457,
+    82.56934,
+    7.64259
+   ]
+  },
+  "loss": [
+   {
+    "LossReason": "Lost to competitor",
+    "n": 531,
+    "arr": 17272500.0
+   },
+   {
+    "LossReason": "Price",
+    "n": 490,
+    "arr": 16509300.0
+   },
+   {
+    "LossReason": "No decision",
+    "n": 364,
+    "arr": 13614900.0
+   },
+   {
+    "LossReason": "Timing / budget",
+    "n": 212,
+    "arr": 6178300.0
+   },
+   {
+    "LossReason": "Feature gap",
+    "n": 146,
+    "arr": 4055900.0
+   }
+  ],
+  "seg_win": {
+   "SMB": 0.31952662721893493,
+   "Mid-Market": 0.20414201183431951,
+   "Enterprise": 0.11917098445595854
+  },
+  "booked_vs_model_new_arr": 0.03323796018958092
+ },
+ "cust": {
+  "active": 1212,
+  "active_dec25": 836,
+  "arpa": 2463.5014789242987,
+  "top10": [
+   {
+    "rank": 1,
+    "name": "Ironwave Health",
+    "seg": "Enterprise",
+    "region": "EMEA",
+    "industry": "Professional Services",
+    "arr": 516434.10089376,
+    "yoy": 0.32747593980523404,
+    "products": 2,
+    "tenure": 57,
+    "owner": "Amara Okafor"
+   },
+   {
+    "rank": 2,
+    "name": "Vertexline Analytics",
+    "seg": "Enterprise",
+    "region": "EMEA",
+    "industry": "Healthcare",
+    "arr": 471842.66048292,
+    "yoy": 1.1608003361252894,
+    "products": 3,
+    "tenure": 19,
+    "owner": "Amara Okafor"
+   },
+   {
+    "rank": 3,
+    "name": "Blueline Labs",
+    "seg": "Enterprise",
+    "region": "North America",
+    "industry": "Energy",
+    "arr": 452556.0,
+    "yoy": 0.4264694757545957,
+    "products": 1,
+    "tenure": 29,
+    "owner": "Sofia Alvarez"
+   },
+   {
+    "rank": 4,
+    "name": "Cedarwave Analytics",
+    "seg": "Enterprise",
+    "region": "APAC",
+    "industry": "Retail",
+    "arr": 405523.96735968,
+    "yoy": 0.9457492130462448,
+    "products": 2,
+    "tenure": 32,
+    "owner": "Chloe Wright"
+   },
+   {
+    "rank": 5,
+    "name": "Maplecore Systems",
+    "seg": "Enterprise",
+    "region": "North America",
+    "industry": "Financial Services",
+    "arr": 372015.79697484005,
+    "yoy": null,
+    "products": 2,
+    "tenure": 4,
+    "owner": "Sofia Alvarez"
+   },
+   {
+    "rank": 6,
+    "name": "Granitestone Energy",
+    "seg": "Enterprise",
+    "region": "North America",
+    "industry": "Healthcare",
+    "arr": 340320.0,
+    "yoy": 0.0,
+    "products": 2,
+    "tenure": 56,
+    "owner": "James O'Connor"
+   },
+   {
+    "rank": 7,
+    "name": "Harborview Retail Group",
+    "seg": "Enterprise",
+    "region": "North America",
+    "industry": "Hospitality",
+    "arr": 334608.0,
+    "yoy": 0.13005065856129683,
+    "products": 2,
+    "tenure": 16,
+    "owner": "James O'Connor"
+   },
+   {
+    "rank": 8,
+    "name": "Summitbridge Foods",
+    "seg": "Enterprise",
+    "region": "North America",
+    "industry": "Logistics",
+    "arr": 334116.0,
+    "yoy": 0.6006323656223052,
+    "products": 2,
+    "tenure": 43,
+    "owner": "Sofia Alvarez"
+   },
+   {
+    "rank": 9,
+    "name": "Coralspring Supply Co.",
+    "seg": "Enterprise",
+    "region": "North America",
+    "industry": "Education",
+    "arr": 329184.0,
+    "yoy": 0.2924990576705617,
+    "products": 2,
+    "tenure": 29,
+    "owner": "Sofia Alvarez"
+   },
+   {
+    "rank": 10,
+    "name": "Lumenbridge Hotels",
+    "seg": "Enterprise",
+    "region": "North America",
+    "industry": "Professional Services",
+    "arr": 316464.0,
+    "yoy": 0.3728266527850077,
+    "products": 1,
+    "tenure": 20,
+    "owner": "Sofia Alvarez"
+   }
+  ],
+  "top10_share": 0.10809809468453768,
+  "risk": [
+   {
+    "name": "Northpath Foods",
+    "seg": "Enterprise",
+    "arr": 229356.0,
+    "change": -0.10187491189323805,
+    "owner": "James O'Connor"
+   },
+   {
+    "name": "Cedarridge Partners",
+    "seg": "Enterprise",
+    "arr": 231756.0,
+    "change": -0.09811338376762868,
+    "owner": "James O'Connor"
+   },
+   {
+    "name": "Lumengate Analytics",
+    "seg": "Mid-Market",
+    "arr": 39564.0,
+    "change": -0.26059654631083207,
+    "owner": "Priya Nair"
+   },
+   {
+    "name": "Brightpath Foods",
+    "seg": "Mid-Market",
+    "arr": 25644.0,
+    "change": -0.3239481176842771,
+    "owner": "Sofia Alvarez"
+   },
+   {
+    "name": "Ironpath Health",
+    "seg": "Mid-Market",
+    "arr": 26827.680309360003,
+    "change": -0.28121914431639794,
+    "owner": "Sofia Alvarez"
+   },
+   {
+    "name": "Silvercore Studios",
+    "seg": "Mid-Market",
+    "arr": 29202.390839519998,
+    "change": -0.25508216454054145,
+    "owner": "Chloe Wright"
+   }
+  ],
+  "risk_n": 44,
+  "risk_arr": 953779.2189387601,
+  "cohorts": [
+   {
+    "cohort": "Jan",
+    "n": 50,
+    "ret": [
+     1.0,
+     1.0975355123451733,
+     1.0958854698777472,
+     1.1310613110290675,
+     1.1398200189819532,
+     1.1506356659729038,
+     1.1628293567492984,
+     1.1136754319610678,
+     1.0874421528421112,
+     1.0982379819113979,
+     1.1039824937295746,
+     1.1121588028310407
+    ]
+   },
+   {
+    "cohort": "Feb",
+    "n": 52,
+    "ret": [
+     1.0,
+     1.014415099834204,
+     1.0326136550845615,
+     1.0054760672884917,
+     1.0109652821865578,
+     0.9597743303006567,
+     0.9535818473901745,
+     0.9755059406436238,
+     0.9789399992394018,
+     0.9615484942005176,
+     0.9178181460254438
+    ]
+   },
+   {
+    "cohort": "Mar",
+    "n": 46,
+    "ret": [
+     1.0,
+     1.0027061125037235,
+     0.9973151080764381,
+     1.0206122842553058,
+     1.0397813814900803,
+     1.0657654989499419,
+     1.0714488172189818,
+     1.0380228323382432,
+     1.0361922324352681,
+     1.0547717382257784
+    ]
+   },
+   {
+    "cohort": "Apr",
+    "n": 46,
+    "ret": [
+     1.0,
+     0.9747962154852735,
+     0.963741114460873,
+     0.9673880605297074,
+     0.9884037613510194,
+     0.98448076881886,
+     1.0377057502723714,
+     0.7995488548854971,
+     0.8822598398708832
+    ]
+   },
+   {
+    "cohort": "May",
+    "n": 55,
+    "ret": [
+     1.0,
+     1.0260841326776255,
+     1.0221709922992561,
+     1.0164557663094158,
+     0.9867992686133087,
+     1.0403322057271407,
+     1.1220453657121188,
+     1.1426700784714194
+    ]
+   },
+   {
+    "cohort": "Jun",
+    "n": 58,
+    "ret": [
+     1.0,
+     1.0118268721957528,
+     1.0647111462628853,
+     1.086395365362462,
+     1.1156874995818336,
+     1.106131498253994,
+     1.1137596304744135
+    ]
+   },
+   {
+    "cohort": "Jul",
+    "n": 53,
+    "ret": [
+     1.0,
+     1.005492677846884,
+     1.0695052110082648,
+     1.0628873884970635,
+     1.0686276056092014,
+     1.0456991191846319
+    ]
+   },
+   {
+    "cohort": "Aug",
+    "n": 52,
+    "ret": [
+     1.0,
+     1.0307038078348032,
+     1.038590716685863,
+     1.0379433527244992,
+     1.0392525463441258
+    ]
+   },
+   {
+    "cohort": "Sep",
+    "n": 53,
+    "ret": [
+     1.0,
+     0.9647829619081902,
+     0.9741728915208004,
+     1.0373923699059433
+    ]
+   },
+   {
+    "cohort": "Oct",
+    "n": 59,
+    "ret": [
+     1.0,
+     0.889810724527641,
+     0.8949318273327942
+    ]
+   },
+   {
+    "cohort": "Nov",
+    "n": 62,
+    "ret": [
+     1.0,
+     0.9770641932478659
+    ]
+   },
+   {
+    "cohort": "Dec",
+    "n": 61,
+    "ret": [
+     1.0
+    ]
+   }
+  ],
+  "industry": [
+   {
+    "label": "Healthcare",
+    "value": 4.36445276820888
+   },
+   {
+    "label": "Hospitality",
+    "value": 4.15705720508316
+   },
+   {
+    "label": "Retail",
+    "value": 4.14349370590008
+   },
+   {
+    "label": "Financial Services",
+    "value": 4.028184800195881
+   },
+   {
+    "label": "Professional Services",
+    "value": 3.77690228311812
+   },
+   {
+    "label": "Logistics",
+    "value": 3.29659556312028
+   },
+   {
+    "label": "Manufacturing",
+    "value": 3.17236947870864
+   },
+   {
+    "label": "Education",
+    "value": 3.1606775861346
+   },
+   {
+    "label": "Media",
+    "value": 3.0649203267155998
+   },
+   {
+    "label": "Energy",
+    "value": 2.66451179228976
+   }
+  ],
+  "active_series": [
+   867,
+   893,
+   922,
+   955,
+   995,
+   1035,
+   1061,
+   1086,
+   1113,
+   1155,
+   1181,
+   1212
+  ],
+  "new_logos": [
+   50,
+   52,
+   46,
+   46,
+   55,
+   58,
+   53,
+   52,
+   53,
+   59,
+   62,
+   61
+  ],
+  "churned_logos": [
+   19,
+   26,
+   17,
+   13,
+   15,
+   18,
+   27,
+   27,
+   26,
+   17,
+   36,
+   30
+  ],
+  "median_tenure": 14.684625492772668
+ }
+}
